@@ -18,10 +18,12 @@ public:
 
     void RegisterCronJob(const CronConfig &config, Runnable *runnable);
     void DestroyCronJobs(Runnable *runnable); // 销毁全部对应Runnable的任务
+
 private:
     BotEngineImpl *PImpl;
     BotEngine(void);
     static BotEngine Instance;
+    friend void DoCronThread(void);
 };
 
 }

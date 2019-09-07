@@ -1,24 +1,11 @@
 #include <list>
 #include "BotEngine.hpp"
+#include "BotEngineImpl.hpp"
 
 namespace DiaoBot
 {
 
 BotEngine BotEngine::Instance;
-
-struct CronJobPair
-{
-    CronConfig Config;
-    Runnable*  Task;
-    CronJobPair(const CronConfig &config, Runnable *runnable):
-        Config(config), Task(runnable) { }
-};
-
-class BotEngineImpl
-{
-    friend class BotEngine;
-    std::list<CronJobPair> CronJobList;
-};
 
 BotEngine::BotEngine(void)
 {
@@ -50,6 +37,11 @@ void BotEngine::DestroyCronJobs(Runnable *runnable)
         }
     }
     delete runnable;
+}
+
+Runnable::~Runnable(void)
+{
+    
 }
 
 }

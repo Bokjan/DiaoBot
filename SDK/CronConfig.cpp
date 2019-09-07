@@ -80,30 +80,56 @@ void CronConfig::ClearDayOfWeek(int x)
     DayOfWeek = ClearBit(DayOfWeek, x);
 }
 
-bool CronConfig::IsSetMinute(int x)
+bool CronConfig::IsSetMinute(int x) const
 {
-    return GetBit(Minute, x) == 1;
+    return GetBit(Minute, x) != 0;
 }
 
-bool CronConfig::IsSetHour(int x)
+bool CronConfig::IsSetHour(int x) const
 {
-    return GetBit(Hour, x) == 1;
+    return GetBit(Hour, x) != 0;
 }
 
-bool CronConfig::IsSetDay(int x)
+bool CronConfig::IsSetDay(int x) const
 {
-    return GetBit(Day, x) == 1;
+    return GetBit(Day, x) != 0;
 }
 
-bool CronConfig::IsSetMonth(int x)
+bool CronConfig::IsSetMonth(int x) const
 {
-    return GetBit(Month, x) == 1;
+    return GetBit(Month, x) != 0;
 }
 
-bool CronConfig::IsSetDayOfWeek(int x)
+bool CronConfig::IsSetDayOfWeek(int x) const
 {
-    return GetBit(DayOfWeek, x) == 1;
+    return GetBit(DayOfWeek, x) != 0;
 }
+
+uint64_t CronConfig::GetMinute(void) const
+{
+    return Minute;
+}
+
+uint32_t CronConfig::GetHour(void) const
+{
+    return Hour;
+}
+
+uint32_t CronConfig::GetDay(void) const
+{
+    return Day;
+}
+
+uint32_t CronConfig::GetMonth(void) const
+{
+    return Month;
+}
+
+uint32_t CronConfig::GetDayOfWeek(void) const
+{
+    return DayOfWeek;
+}
+
 
 
 
