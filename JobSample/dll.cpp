@@ -5,7 +5,7 @@ const char * DB_DllName(void)
     return "Sample Plugin";
 }
 
-void * DB_GetHandle(void)
+void DB_BindEnginePtr(DiaoBot::BotEngine *engine)
 {
-    return nullptr;
+    
 }
