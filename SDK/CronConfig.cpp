@@ -8,19 +8,19 @@ static T SetBit(T x, int pos)
 {
     if (pos == CronConfig::EVERY)
         return ~0;
-    return x | (1 << pos);
+    return x | (static_cast<T>(1) << pos);
 }
 
 template <typename T>
-static int GetBit(T x, int pos)
+static T GetBit(T x, int pos)
 {
-    return x & (1 << pos);
+    return x & (static_cast<T>(1) << pos);
 }
 
 template <typename T>
-static int ClearBit(T x, int pos)
+static T ClearBit(T x, int pos)
 {
-    return x & (~(1 << pos));
+    return x & (~(static_cast<T>(1) << pos));
 }
 
 CronConfig::CronConfig(void):
