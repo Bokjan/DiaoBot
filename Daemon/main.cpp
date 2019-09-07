@@ -58,7 +58,7 @@ void LoadSharedObjects(void)
         }
         LOG("%s loaded, self description: %s", i.Value.c_str(), getname());
         auto bindengine = DiaoBot::DylibManager::GetInstance().GetSymbol<decltype(&DB_BindEnginePtr)>(i.Key, "DB_BindEnginePtr");
-        if (getname == nullptr)
+        if (bindengine == nullptr)
         {
             LOG("%s doesn't have symbol `DB_BindEnginePtr`!", i.Value.c_str());
             continue;
