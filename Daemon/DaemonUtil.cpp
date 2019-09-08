@@ -66,7 +66,9 @@ void LoadSharedObjects(void)
 
 void InitializeBotEngine(void)
 {
-
+    if (!MainConf.HasKV("root", "webhook"))
+        throw std::runtime_error("Webhook URL not configured!");
+    BotEngine::GetInstance().SetWebhookUrl(MainConf.GetKV("root", "webhook"));
 }
 
 }

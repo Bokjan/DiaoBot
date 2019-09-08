@@ -19,6 +19,8 @@ class BotEngineImpl
 {
     friend class BotEngine;
     friend void DoCronThread(void);
+
+    string WebhookUrl;
     std::list<CronJobPair> CronJobList;
 };
 

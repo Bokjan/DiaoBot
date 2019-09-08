@@ -1,9 +1,50 @@
 #include <list>
+#include <curl/curl.h>
+#include <rapidjson/document.h>
+#include "Log.hpp"
 #include "BotEngine.hpp"
 #include "BotEngineImpl.hpp"
+#include "WeworkMessage.hpp"
 
 namespace DiaoBot
 {
+
+static size_t CurlBodyWriteFunction(void *ptr, size_t size, size_t nmemb, string *data)
+{
+    data->append((char *)ptr, size * nmemb);
+    return size * nmemb;
+}
+
+static void CurlHttpRequest(long &response_code, string &retbody, const string &url, const char *data = nullptr, size_t data_len = 0)
+{
+    auto curl = curl_easy_init();
+    if (curl == nullptr)
+    {
+        LOG("%s", "Could not get a cURL handle!");
+        return;
+    }
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    if (data != nullptr)
+    {
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
+        curl_easy_setopt(curl, CURLOPT_POST, 1);
+        if (data_len != 0)
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data_len);
+    }
+    string header;
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlBodyWriteFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &retbody);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &header);
+    auto retcode = curl_easy_perform(curl);
+    if (retcode != CURLE_OK)
+    {
+        LOG("cURL request failed on: %s", url.c_str());
+        goto RETURN;
+    }
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+RETURN:
+    curl_easy_cleanup(curl);
+}
 
 BotEngine BotEngine::Instance;
 
@@ -39,9 +80,62 @@ void BotEngine::DestroyCronJobs(Runnable *runnable)
     delete runnable;
 }
 
-Runnable::~Runnable(void)
+HttpResponse BotEngine::HttpGetRequest(const string &url, bool proxy)
 {
-    
+    HttpResponse ret;
+    CurlHttpRequest(ret.ResponseCode, ret.BodyData, url);
+    return ret;
 }
+
+HttpResponse BotEngine::HttpPostRequest(const string &url, const string &body, bool proxy)
+{
+    HttpResponse ret;
+    CurlHttpRequest(ret.ResponseCode, ret.BodyData, url, body.data(), body.length());
+    return ret;
+}
+
+void BotEngine::SetWebhookUrl(const string &url)
+{
+    PImpl->WebhookUrl = url;
+}
+
+int BotEngine::SendMessage(const WeworkMessage &message)
+{
+    auto response = this->HttpPostRequest(PImpl->WebhookUrl, message.GetJson());
+    if (response.ResponseCode != 200)
+        return static_cast<int>(-response.ResponseCode);
+    rapidjson::Document doc;
+    doc.Parse(response.BodyData.c_str());
+    int ret;
+    do
+    {
+        if (doc.HasParseError())
+        {
+            LOG("Cannot parse: %s", response.BodyData.c_str());
+            ret = -8964;
+            break;
+        }
+        if (!doc.HasMember("errcode"))
+        {
+            LOG("`errcode` not found in: %s", response.BodyData.c_str());
+            ret = -8965;
+            break;
+        }
+        ret = doc["errcode"].GetInt();
+        if (ret == 0)
+            break;
+        if (!doc.HasMember("errmsg"))
+        {
+            LOG("`errmsg` not found in: %s", response.BodyData.c_str());
+            ret = -8966;
+            break;
+        }
+        LOG("Error message: %s", doc["errmsg"].GetString());
+    }
+    while (false);
+    return ret;
+}
+
+Runnable::~Runnable(void) { }
 
 }

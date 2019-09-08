@@ -2,6 +2,7 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
+#include "BotEngine.hpp"
 #include "WeworkMessage.hpp"
 #include "../ThirdParty/md5/src/md5.h"
 #include "../ThirdParty/cpp-base64/base64.h"
@@ -282,6 +283,11 @@ string WeworkImageMessage::GetJson(void) const
     w.EndObject();
     w.EndObject();
     return string(sb.GetString(), sb.GetSize());
+}
+
+void WeworkImageMessage::SetHttpImage(const string &url)
+{
+    this->SetRawImage(BotEngine::GetInstance().HttpGetRequest(url).BodyData);
 }
 
 }

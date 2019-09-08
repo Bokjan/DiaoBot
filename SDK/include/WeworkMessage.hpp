@@ -114,6 +114,7 @@ class WeworkImageMessage : public WeworkMessage
 {
 public:
     void SetRawImage(const string &buf);
+    void SetHttpImage(const string &url);
 
     string GetJson(void) const override;
 
