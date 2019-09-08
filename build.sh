@@ -13,7 +13,8 @@ mkdir -p Daemon/build
 cd SDK/build
 cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 make -j7
-cp libdiaobot.so ../../Dist
+make install
+# cp libdiaobot.so ../../Dist
 
 cd ../../Daemon/build
 cmake .. -DCMAKE_BUILD_TYPE=RELEASE #-DTHIRD_BUILDS_PREFIX="/data/builds/"

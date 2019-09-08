@@ -107,6 +107,14 @@ WeworkNewsMessage::WeworkNewsMessage(void)
     PImpl = std::make_shared<WeworkNewsMessageImpl>();
 }
 
+WeworkNewsMessage::Article* WeworkNewsMessage::AddArticle(void)
+{
+    if (PImpl->Articles.size() >= 8)
+        return nullptr;
+    PImpl->Articles.emplace_back(Article());
+    return &(PImpl->Articles.back());
+}
+
 bool WeworkNewsMessage::AddArticle(const Article &article)
 {
     if (PImpl->Articles.size() >= 8)

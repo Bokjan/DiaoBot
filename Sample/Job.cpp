@@ -1,7 +1,7 @@
 #include "Job.hpp"
-#include "Log.hpp"
-#include "BotEngine.hpp"
-#include "WeworkMessage.hpp"
+#include <DiaoBot/Log.hpp>
+#include <DiaoBot/BotEngine.hpp>
+#include <DiaoBot/WeworkMessage.hpp>
 
 namespace Sample
 {

@@ -1,6 +1,6 @@
-#include "dll.h"
 #include "Job.hpp"
-#include "BotEngine.hpp"
+#include <DiaoBot/dll.h>
+#include <DiaoBot/BotEngine.hpp>
 
 const char * DB_DllName(void)
 {

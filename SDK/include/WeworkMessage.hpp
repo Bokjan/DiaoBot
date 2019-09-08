@@ -60,7 +60,8 @@ public:
 
     WeworkNewsMessage(void);
 
-    bool AddArticle(const Article &article); // Cannot exceed 8
+    Article*    AddArticle(void);
+    bool        AddArticle(const Article &article); // Cannot exceed 8
 
     string GetJson(void) const override;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Runnable.hpp"
+#include <DiaoBot/Runnable.hpp>
 
 namespace Sample
 {
