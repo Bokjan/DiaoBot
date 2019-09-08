@@ -7,7 +7,7 @@ template <typename T>
 static T SetBit(T x, int pos)
 {
     if (pos == CronConfig::EVERY)
-        return ~0;
+        return ~(static_cast<T>(0));
     return x | (static_cast<T>(1) << pos);
 }
 
@@ -129,8 +129,5 @@ uint32_t CronConfig::GetDayOfWeek(void) const
 {
     return DayOfWeek;
 }
-
-
-
 
 }
