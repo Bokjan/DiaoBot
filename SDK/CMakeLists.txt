@@ -12,8 +12,8 @@ INCLUDE_DIRECTORIES(./include)
 LINK_LIBRARIES(pthread dl z curl)
 
 FILE(GLOB APP_SOURCES "./*.cpp")
-FILE(GLOB APP_SOURCES ${APP_SOURCES} "../ThirdParty/md5/src/md5.cpp")
-FILE(GLOB APP_SOURCES ${APP_SOURCES} "../ThirdParty/cpp-base64/base64.cpp")
+SET(APP_SOURCES ${APP_SOURCES} "../ThirdParty/md5/src/md5.cpp")
+SET(APP_SOURCES ${APP_SOURCES} "../ThirdParty/cpp-base64/base64.cpp")
 
 ADD_LIBRARY(diaobot SHARED ${APP_SOURCES})
 INSTALL(DIRECTORY include/ DESTINATION include/DiaoBot)
