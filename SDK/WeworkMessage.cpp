@@ -26,6 +26,19 @@ class WeworkTextMessageImpl
     std::vector<string> MentionedMobileList;
 };
 
+class WeworkNewsMessageImpl
+{
+    friend class WeworkNewsMessage;
+    std::vector<WeworkNewsMessage::Article> Articles;
+};
+
+class WeworkMarkdownMessageImpl
+{
+    friend class WeworkMarkdownMessage;
+    string Content;
+    std::vector<std::shared_ptr<WeworkMarkdownMessage::Attachment>> AttachmentPtrs;
+};
+
 WeworkTextMessage::WeworkTextMessage(void)
 {
     PImpl = std::make_shared<WeworkTextMessageImpl>();
@@ -49,13 +62,16 @@ void WeworkTextMessage::AddMentionedMobile(const string &m)
     PImpl->MentionedMobileList.emplace_back(m);
 }
 
-string WeworkTextMessage::GetJson(void)
+string WeworkTextMessage::GetJson(void) const
 {
     rapidjson::StringBuffer sb;
     rapidjson::Writer<rapidjson::StringBuffer> w(sb);
     w.StartObject();
-    w.Key("chatid");
-    w.String(this->ChatID.c_str());
+    if (!this->ChatID.empty())
+    {
+        w.Key("chatid");
+        w.String(this->ChatID.c_str());
+    }
     w.Key("msgtype");
     w.String("text");
     w.Key("text");
@@ -79,6 +95,161 @@ string WeworkTextMessage::GetJson(void)
         w.EndArray();
     }
     w.EndObject();
+    w.EndObject();
+    return string(sb.GetString(), sb.GetSize());
+}
+
+WeworkNewsMessage::WeworkNewsMessage(void)
+{
+    PImpl = std::make_shared<WeworkNewsMessageImpl>();
+}
+
+bool WeworkNewsMessage::AddArticle(const Article &article)
+{
+    if (PImpl->Articles.size() >= 8)
+        return false;
+    PImpl->Articles.emplace_back(article);
+    return true;
+}
+
+string WeworkNewsMessage::GetJson(void) const
+{
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> w(sb);
+    w.StartObject();
+    if (!this->ChatID.empty())
+    {
+        w.Key("chatid");
+        w.String(this->ChatID.c_str());
+    }
+    w.Key("msgtype");
+    w.String("news");
+    w.Key("news");
+    w.StartObject();
+    w.Key("articles");
+    w.StartArray();
+    for (const auto &i : PImpl->Articles)
+    {
+        w.StartObject();
+        w.Key("title");
+        w.String(i.Title.c_str());
+        if (!i.Description.empty())
+        {
+            w.Key("description");
+            w.String(i.Description.c_str());
+        }
+        w.Key("url");
+        w.String(i.URL.c_str());
+        if (!i.PictureURL.empty())
+        {
+            w.Key("picurl");
+            w.String(i.PictureURL.c_str());
+        }
+        w.EndObject();
+    }
+    w.EndArray();
+    w.EndObject();
+    w.EndObject();
+    return string(sb.GetString(), sb.GetSize());
+}
+
+WeworkMarkdownMessage::ButtonAction::ButtonAction(void)
+{
+    Type = "button";
+    TextColor = "2EAB49";
+    BorderColor = "2EAB49";
+}
+
+struct WeworkMarkdownMessage::AttachmentImpl
+{
+    std::vector<std::shared_ptr<WeworkMarkdownMessage::Action>> ActionPtrs;
+};
+
+WeworkMarkdownMessage::Attachment::Attachment(void)
+{
+    PImpl = std::make_shared<WeworkMarkdownMessage::AttachmentImpl>();
+}
+
+std::shared_ptr<WeworkMarkdownMessage::ButtonAction> WeworkMarkdownMessage::Attachment::AddButtonAction(void)
+{
+    auto ptr = std::make_shared<WeworkMarkdownMessage::ButtonAction>();
+    PImpl->ActionPtrs.emplace_back(ptr);
+    return ptr;
+}
+
+void WeworkMarkdownMessage::ButtonAction::WriteJsonObject(void *_w) const
+{
+    auto w = static_cast<rapidjson::Writer<rapidjson::StringBuffer>*>(_w);
+    w->StartObject();
+    w->Key("type");
+    w->String(Type.c_str());
+    w->Key("name");
+    w->String(Name.c_str());
+    w->Key("text");
+    w->String(Text.c_str());
+    w->Key("border_color");
+    w->String(BorderColor.c_str());
+    w->Key("text_color");
+    w->String(TextColor.c_str());
+    w->Key("value");
+    w->String(Value.c_str());
+    if (!ReplaceText.empty())
+    {
+        w->Key("replace_text");
+        w->String(ReplaceText.c_str());
+    }
+    w->EndObject();
+}
+
+WeworkMarkdownMessage::WeworkMarkdownMessage(void)
+{
+    PImpl = std::make_shared<WeworkMarkdownMessageImpl>();
+}
+
+bool WeworkMarkdownMessage::SetContent(const string &c)
+{
+    if (c.length() > 2048)
+        return false;
+    PImpl->Content = c;
+    return true;
+}
+
+std::shared_ptr<WeworkMarkdownMessage::Attachment> WeworkMarkdownMessage::AddAttachment(void)
+{
+    auto ptr = std::make_shared<WeworkMarkdownMessage::Attachment>();
+    PImpl->AttachmentPtrs.emplace_back(ptr);
+    return ptr;
+}
+
+string WeworkMarkdownMessage::GetJson(void) const
+{
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> w(sb);
+    w.StartObject();
+    if (!this->ChatID.empty())
+    {
+        w.Key("chatid");
+        w.String(this->ChatID.c_str());
+    }
+    w.Key("msgtype");
+    w.String("markdown");
+    w.Key("content");
+    w.String(PImpl->Content.c_str());
+    w.Key("attachments");
+    w.StartArray();
+    for (const auto &i : PImpl->AttachmentPtrs)
+    {
+        w.Key("callback_id");
+        w.String(i->CallbackID.c_str());
+        w.Key("actions");
+        w.StartArray();
+        for (const auto &p : i->PImpl->ActionPtrs)
+        {
+            p->WriteJsonObject(&w);
+        }
+        w.EndArray();
+    }
+    w.EndArray();
     w.EndObject();
     return string(sb.GetString(), sb.GetSize());
 }
