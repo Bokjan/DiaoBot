@@ -15,15 +15,19 @@ void CronSample::Run(void)
     // wnm.AddArticle(DiaoBot::WeworkNewsMessage::Article("标题", "描述", "http://tiyan.oa.com", ""));
     // LOG("%s", wnm.GetJson().c_str());
 
-    DiaoBot::WeworkMarkdownMessage wmm;
-    wmm.SetContent("Hello!");
-    auto p = wmm.AddAttachment();
-    p->CallbackID = "test_callback_id";
-    auto b = p->AddButtonAction();
-    b->Name = "callback_fallthrough_name";
-    b->Text = "Test";
-    b->Value = "callback_fallthrough_value";
-    LOG("%s", wmm.GetJson().c_str());
+    // DiaoBot::WeworkMarkdownMessage wmm;
+    // wmm.SetContent("Hello!");
+    // auto p = wmm.AddAttachment();
+    // p->CallbackID = "test_callback_id";
+    // auto b = p->AddButtonAction();
+    // b->Name = "callback_fallthrough_name";
+    // b->Text = "Test";
+    // b->Value = "callback_fallthrough_value";
+    // LOG("%s", wmm.GetJson().c_str());
+
+    DiaoBot::WeworkImageMessage wim;
+    wim.SetRawImage("fake binary");
+    LOG("%s", wim.GetJson().c_str());
 }
 
 }

@@ -3,6 +3,8 @@
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include "WeworkMessage.hpp"
+#include "../ThirdParty/md5/src/md5.h"
+#include "../ThirdParty/cpp-base64/base64.h"
 
 namespace DiaoBot
 {
@@ -250,6 +252,34 @@ string WeworkMarkdownMessage::GetJson(void) const
         w.EndArray();
     }
     w.EndArray();
+    w.EndObject();
+    return string(sb.GetString(), sb.GetSize());
+}
+
+void WeworkImageMessage::SetRawImage(const string &buf)
+{
+    RawImageBuffer = buf;
+}
+
+string WeworkImageMessage::GetJson(void) const
+{
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> w(sb);
+    w.StartObject();
+    if (!this->ChatID.empty())
+    {
+        w.Key("chatid");
+        w.String(this->ChatID.c_str());
+    }
+    w.Key("msgtype");
+    w.String("image");
+    w.Key("image");
+    w.StartObject();
+    w.Key("base64");
+    w.String(base64_encode(reinterpret_cast<const unsigned char *>(RawImageBuffer.data()), RawImageBuffer.length()).c_str());
+    w.Key("md5");
+    w.String(MD5(RawImageBuffer).toStr().c_str());
+    w.EndObject();
     w.EndObject();
     return string(sb.GetString(), sb.GetSize());
 }

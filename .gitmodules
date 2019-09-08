@@ -1,0 +1,6 @@
+[submodule "ThirdParty/cpp-base64"]
+	path = ThirdParty/cpp-base64
+	url = https://github.com/ReneNyffenegger/cpp-base64
+[submodule "ThirdParty/md5"]
+	path = ThirdParty/md5
+	url = https://github.com/JieweiWei/md5

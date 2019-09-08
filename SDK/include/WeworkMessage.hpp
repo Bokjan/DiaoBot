@@ -110,4 +110,15 @@ private:
     std::shared_ptr<WeworkMarkdownMessageImpl> PImpl;
 };
 
+class WeworkImageMessage : public WeworkMessage
+{
+public:
+    void SetRawImage(const string &buf);
+
+    string GetJson(void) const override;
+
+private:
+    string RawImageBuffer;
+};
+
 }
