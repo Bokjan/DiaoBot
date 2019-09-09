@@ -1,4 +1,5 @@
 #include <list>
+#include <cstdlib>
 #include <curl/curl.h>
 #include <rapidjson/document.h>
 #include "Log.hpp"
@@ -15,13 +16,51 @@ static size_t CurlBodyWriteFunction(void *ptr, size_t size, size_t nmemb, string
     return size * nmemb;
 }
 
-static void CurlHttpRequest(long &response_code, string &retbody, const string &url, const char *data = nullptr, size_t data_len = 0)
+static string GetHostInUrl(const string &url)
 {
+    int start;
+    int slash_count = 0;
+    decltype(url.length()) i;
+    for (i = 0; i < url.length(); ++i)
+    {
+        if (url[i] == '/')
+            ++slash_count;
+        if (slash_count == 2) // protocol
+            break;
+    }
+    start = ++i;
+    for ( ; i < url.length(); ++i)
+        if (url[i] == '/')
+            break;
+    return string(url.c_str() + start, i - start);
+}
+
+static void CurlHttpRequest(long &response_code, string &retbody, const string &url, bool proxy = true, const char *data = nullptr, size_t data_len = 0)
+{
+    string env_no_proxy;
     auto curl = curl_easy_init();
     if (curl == nullptr)
     {
         LOG("%s", "Could not get a cURL handle!");
         return;
+    }
+    if (!proxy)
+    {
+        // LOG("host=%s", GetHostInUrl(url).c_str());
+        string host = GetHostInUrl(url);
+        auto origin_no_proxy = getenv("no_proxy");
+        if (origin_no_proxy != nullptr)
+            env_no_proxy = origin_no_proxy;
+        if (origin_no_proxy == nullptr)
+        {
+            setenv("no_proxy", host.c_str(), 1);
+        }
+        else
+        {
+            string t = env_no_proxy;
+            t.append(",").append(host);
+            setenv("no_proxy", t.c_str(), 1);
+        }
     }
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     if (data != nullptr)
@@ -43,6 +82,13 @@ static void CurlHttpRequest(long &response_code, string &retbody, const string &
     }
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 RETURN:
+    if (!proxy)
+    {
+        if (env_no_proxy.empty())
+            unsetenv("no_proxy");
+        else
+            setenv("no_proxy", env_no_proxy.c_str(), 1);
+    }
     curl_easy_cleanup(curl);
 }
 
@@ -83,14 +129,15 @@ void BotEngine::DestroyCronJobs(Runnable *runnable)
 HttpResponse BotEngine::HttpGetRequest(const string &url, bool proxy)
 {
     HttpResponse ret;
-    CurlHttpRequest(ret.ResponseCode, ret.BodyData, url);
+    CurlHttpRequest(ret.ResponseCode, ret.BodyData, url, proxy);
+    // LOG("ret.len = %lu, data:\n%s", ret.BodyData.length(), ret.BodyData.data());
     return ret;
 }
 
 HttpResponse BotEngine::HttpPostRequest(const string &url, const string &body, bool proxy)
 {
     HttpResponse ret;
-    CurlHttpRequest(ret.ResponseCode, ret.BodyData, url, body.data(), body.length());
+    CurlHttpRequest(ret.ResponseCode, ret.BodyData, url, proxy, body.data(), body.length());
     return ret;
 }
 

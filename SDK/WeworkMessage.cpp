@@ -293,9 +293,9 @@ string WeworkImageMessage::GetJson(void) const
     return string(sb.GetString(), sb.GetSize());
 }
 
-void WeworkImageMessage::SetHttpImage(const string &url)
+void WeworkImageMessage::SetHttpImage(const string &url, bool proxy)
 {
-    this->SetRawImage(BotEngine::GetInstance().HttpGetRequest(url).BodyData);
+    this->SetRawImage(BotEngine::GetInstance().HttpGetRequest(url, proxy).BodyData);
 }
 
 }

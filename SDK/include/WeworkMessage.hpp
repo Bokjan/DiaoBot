@@ -5,6 +5,8 @@
 
 using std::string;
 
+constexpr bool NO_PROXY = false;
+
 namespace DiaoBot
 {
 
@@ -115,7 +117,7 @@ class WeworkImageMessage : public WeworkMessage
 {
 public:
     void SetRawImage(const string &buf);
-    void SetHttpImage(const string &url);
+    void SetHttpImage(const string &url, bool proxy = true);
 
     string GetJson(void) const override;
 
