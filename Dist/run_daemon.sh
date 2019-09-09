@@ -8,4 +8,4 @@ SCRIPT_PATH=`pwd`/
 
 # export LD_LIBRARY_PATH=$SCRIPT_PATH:$LD_LIBRARY_PATH
 
-./diaobotd "${SCRIPT_PATH}sample.conf" foreground
+./diaobotd "${SCRIPT_PATH}sample.conf"

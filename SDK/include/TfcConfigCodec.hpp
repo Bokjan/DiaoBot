@@ -76,6 +76,7 @@ private:
     void ResetPImpl(void);
 };
 
+string ReadFile(const char *filename);
 std::list<string> SplitString(const string &s, char delimeter);
 
 }

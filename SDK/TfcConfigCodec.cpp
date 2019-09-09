@@ -6,7 +6,7 @@
 namespace DiaoBot
 {
 
-static string ReadFile(const char *filename)
+string ReadFile(const char *filename)
 {
     string ret;
     char buf[1024];
