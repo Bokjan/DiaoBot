@@ -16,4 +16,4 @@ LINK_LIBRARIES(diaobot dl)
 FILE(GLOB APP_SOURCES "./*.cpp")
 SET(APP_SOURCES ${APP_SOURCES} "../ThirdParty/mongoose/mongoose.c")
 
-ADD_EXECUTABLE(diaobot.out ${APP_SOURCES})
+ADD_EXECUTABLE(diaobotd ${APP_SOURCES})

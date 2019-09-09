@@ -16,13 +16,25 @@ static void DoLoop(std::list<CronJobPair> &list, tm *now)
         bool willExecute = false;
         do
         {
+            // LOG("%lx, %x, %x, %x, %x", 
+            //     i.Config.GetMinute(),
+            //     i.Config.GetHour(),
+            //     i.Config.GetMonth(),
+            //     i.Config.GetDay(),
+            //     i.Config.GetDayOfWeek());
+            // LOG("NOW: %d, %d, %d, %d, %d",
+            //     now->tm_min,
+            //     now->tm_hour,
+            //     now->tm_mon,
+            //     now->tm_mday,
+            //     now->tm_wday);
             if (!i.Config.IsSetMinute(now->tm_min))
                 break;
             if (!i.Config.IsSetHour(now->tm_hour))
                 break;
             if (!i.Config.IsSetMonth(now->tm_mon + 1))
                 break;
-            if (!i.Config.IsSetDayOfWeek(now->tm_wday + 1) && !i.Config.IsSetDay(now->tm_mday))
+            if (!i.Config.IsSetDayOfWeek((now->tm_wday + 7) % 7) && !i.Config.IsSetDay(now->tm_mday))
                 break;
             willExecute = true;
         }

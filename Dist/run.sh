@@ -8,4 +8,4 @@ SCRIPT_PATH=`pwd`/
 
 # export LD_LIBRARY_PATH=$SCRIPT_PATH:$LD_LIBRARY_PATH
 
-./diaobot.out "${SCRIPT_PATH}sample.conf"
+./diaobotd "${SCRIPT_PATH}sample.conf"

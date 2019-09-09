@@ -19,4 +19,4 @@ make install
 cd ../../Daemon/build
 cmake .. -DCMAKE_BUILD_TYPE=RELEASE #-DTHIRD_BUILDS_PREFIX="/data/builds/"
 make -j7
-cp diaobot.out ../../Dist
+cp diaobotd ../../Dist
