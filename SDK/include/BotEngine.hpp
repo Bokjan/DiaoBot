@@ -27,8 +27,9 @@ public:
 
     int  SendMessage(const WeworkMessage &message);
 
-    void RegisterCronJob(const CronConfig &config, Runnable *runnable);
-    void DestroyCronJobs(Runnable *runnable); // 销毁全部对应Runnable的任务
+    void RegisterCronJob(unsigned int libid, const CronConfig &config, RunnablePtr runnable);
+    void DestroyCronJobs(RunnablePtr runnable); // 销毁全部对应Runnable的任务
+    void DestroyCronJobs(unsigned int libid); // 销毁某动态库下的任务
 
     HttpResponse HttpGetRequest(const string &url, bool proxy = true);
     HttpResponse HttpPostRequest(const string &url, const string &body, bool proxy = true);

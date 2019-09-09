@@ -9,25 +9,13 @@
 namespace DiaoBot
 {
 
-static void DoLoop(std::list<CronJobPair> &list, tm *now)
+static void DoLoop(std::list<CronJob> &list, tm *now)
 {
     for (const auto &i : list)
     {
         bool willExecute = false;
         do
         {
-            // LOG("%lx, %x, %x, %x, %x", 
-            //     i.Config.GetMinute(),
-            //     i.Config.GetHour(),
-            //     i.Config.GetMonth(),
-            //     i.Config.GetDay(),
-            //     i.Config.GetDayOfWeek());
-            // LOG("NOW: %d, %d, %d, %d, %d",
-            //     now->tm_min,
-            //     now->tm_hour,
-            //     now->tm_mon,
-            //     now->tm_mday,
-            //     now->tm_wday);
             if (!i.Config.IsSetMinute(now->tm_min))
                 break;
             if (!i.Config.IsSetHour(now->tm_hour))

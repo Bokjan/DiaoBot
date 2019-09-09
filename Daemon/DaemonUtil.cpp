@@ -44,7 +44,7 @@ void LoadSharedObjects(void)
         }
         catch (const std::runtime_error &e)
         {
-            LOG("Exception caught when loading %s: %s", i.Value.c_str(), e.what());
+            LOG("Exception caught: %s", e.what());
             continue;
         }
         auto getname = DiaoBot::DylibManager::GetInstance().GetSymbol<decltype(&DB_DllName)>(i.Key, "DB_DllName");
@@ -54,13 +54,13 @@ void LoadSharedObjects(void)
             continue;
         }
         LOG("%s loaded, self description: %s", i.Value.c_str(), getname());
-        auto bindengine = DiaoBot::DylibManager::GetInstance().GetSymbol<decltype(&DB_BindEnginePtr)>(i.Key, "DB_BindEnginePtr");
-        if (bindengine == nullptr)
+        auto bind = DiaoBot::DylibManager::GetInstance().GetSymbol<decltype(&DB_Bind)>(i.Key, "DB_Bind");
+        if (bind == nullptr)
         {
-            LOG("%s doesn't have symbol `DB_BindEnginePtr`!", i.Value.c_str());
+            LOG("%s doesn't have symbol `DB_Bind`!", i.Value.c_str());
             continue;
         }
-        bindengine(&DiaoBot::BotEngine::GetInstance());
+        bind(DiaoBot::DylibManager::GetInstance().GetLibraryID(i.Key));
     }
 }
 

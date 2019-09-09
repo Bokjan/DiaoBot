@@ -23,8 +23,7 @@ int main(int argc, char *argv[])
     }
 
     // DAEMON?
-    string pid_file("/var/run/");
-    pid_file.append(DiaoBot::MainConf.GetKV("root", "bot_name")).append(".pid");
+    string pid_file;
     if (argc > 2) // not daemon
     {
         LOG("%s: foreground mode", argv[0]);
@@ -33,7 +32,6 @@ int main(int argc, char *argv[])
     else
     {
         LOG("%s: daemon mode", argv[0]);
-        LOG("Assumed pid file is %s", pid_file.c_str());
 
         // Same bot is running?
         if (!DiaoBot::MainConf.HasKV("root", "bot_name"))
@@ -41,6 +39,8 @@ int main(int argc, char *argv[])
             LOG("%s", "Config `root\\bot_name` not found! It's required under daemon mode!");
             exit(EXIT_FAILURE);
         }
+        pid_file = string("/var/run/").append(DiaoBot::MainConf.GetKV("root", "bot_name")).append(".pid");
+        LOG("Assumed pid file is %s", pid_file.c_str());
         do
         {
             string pid_string = DiaoBot::ReadFile(pid_file.c_str());

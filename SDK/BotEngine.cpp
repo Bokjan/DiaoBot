@@ -109,13 +109,16 @@ BotEngine& BotEngine::GetInstance(void)
     return BotEngine::Instance;
 }
 
-void BotEngine::RegisterCronJob(const CronConfig &config, Runnable *runnable)
+void BotEngine::RegisterCronJob(unsigned int libid, const CronConfig &config, RunnablePtr runnable)
 {
-    PImpl->CronJobList.push_back(CronJobPair(config, runnable));
+    PImpl->CronJobListMutex.lock();
+    PImpl->CronJobList.push_back(CronJob(libid, config, runnable));
+    PImpl->CronJobListMutex.unlock();
 }
 
-void BotEngine::DestroyCronJobs(Runnable *runnable)
+void BotEngine::DestroyCronJobs(RunnablePtr runnable)
 {
+    PImpl->CronJobListMutex.lock();
     for (auto it = PImpl->CronJobList.begin(); it != PImpl->CronJobList.end(); ++it)
     {
         if (it->Task == runnable)
@@ -123,14 +126,26 @@ void BotEngine::DestroyCronJobs(Runnable *runnable)
             PImpl->CronJobList.erase(it++); // 处理迭代器失效问题
         }
     }
-    delete runnable;
+    PImpl->CronJobListMutex.unlock();
+}
+
+void BotEngine::DestroyCronJobs(unsigned int libid)
+{
+    PImpl->CronJobListMutex.lock();
+    for (auto it = PImpl->CronJobList.begin(); it != PImpl->CronJobList.end(); ++it)
+    {
+        if (it->LibID == libid)
+        {
+            PImpl->CronJobList.erase(it++);
+        }
+    }
+    PImpl->CronJobListMutex.unlock();
 }
 
 HttpResponse BotEngine::HttpGetRequest(const string &url, bool proxy)
 {
     HttpResponse ret;
     CurlHttpRequest(ret.ResponseCode, ret.BodyData, url, proxy);
-    // LOG("ret.len = %lu, data:\n%s", ret.BodyData.length(), ret.BodyData.data());
     return ret;
 }
 
@@ -183,6 +198,15 @@ int BotEngine::SendMessage(const WeworkMessage &message)
     return ret;
 }
 
-Runnable::~Runnable(void) { }
+}
 
+const char * __GET_CURRENT_TIME_STRING(void)
+{
+    static char buff[128];
+    time_t t = time(nullptr);
+	tm *u = localtime(&t);
+	sprintf(buff, "%04d-%02d-%02d %02d:%02d:%02d",
+	        1900 + u->tm_year, 1 + u->tm_mon, u->tm_mday,
+	        u->tm_hour, u->tm_min, u->tm_sec);
+    return buff;
 }

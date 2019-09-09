@@ -1,14 +1,11 @@
 #pragma once
 
-namespace DiaoBot
-{
-    class BotEngine;
-}
+extern unsigned int LibraryID;
 
 extern "C" 
 {
 
 const char * DB_DllName(void);
-void         DB_BindEnginePtr(DiaoBot::BotEngine*);
+void         DB_Bind(unsigned int libid);
 
 } 
