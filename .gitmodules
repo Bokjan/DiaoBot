@@ -7,3 +7,9 @@
 [submodule "ThirdParty/mongoose"]
 	path = ThirdParty/mongoose
 	url = https://github.com/cesanta/mongoose
+[submodule "ThirdParty/tinyxml2"]
+	path = ThirdParty/tinyxml2
+	url = https://github.com/leethomason/tinyxml2.git
+[submodule "ThirdParty/URLDecode"]
+	path = ThirdParty/URLDecode
+	url = https://github.com/abejfehr/URLDecode

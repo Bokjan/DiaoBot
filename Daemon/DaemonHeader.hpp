@@ -19,3 +19,6 @@ void KillDiaoBotDaemon(void);
 void GracefulSignalHandler(int signal);
 
 }
+
+// for 3rd-party `URLDecode`
+extern "C" char *urlDecode(const char *str);

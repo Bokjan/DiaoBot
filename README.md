@@ -4,6 +4,7 @@ Group Bot (群机器人) framework for Wework (企业微信). Linux only (tested
 # Prerequisites
 - CMake 3.1 +
 - C++ compiler with C++11 support
+- `OpenSSL` (`libcrypto`)
 - `libcurl`
 - `RapidJSON`
 
