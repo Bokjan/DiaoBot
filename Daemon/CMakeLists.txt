@@ -14,7 +14,6 @@ INCLUDE_DIRECTORIES(../SDK/include)
 LINK_LIBRARIES(diaobot dl crypto)
 
 FILE(GLOB APP_SOURCES "./*.cpp")
-SET(APP_SOURCES ${APP_SOURCES} "../ThirdParty/mongoose/mongoose.c")
 SET(APP_SOURCES ${APP_SOURCES} "../ThirdParty/tinyxml2/tinyxml2.cpp")
 SET(APP_SOURCES ${APP_SOURCES} "../ThirdParty/URLDecode/urldecode.c")
 SET(APP_SOURCES ${APP_SOURCES} "../ThirdParty/WXBizMsgCrypt/WXBizMsgCrypt.cpp")
