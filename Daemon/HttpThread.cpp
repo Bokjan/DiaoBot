@@ -134,6 +134,7 @@ void DoHttpThreadImpl(void)
 void DoHttpThread(void)
 {
     LOG("%s", "HttpThread started");
+    SetupCryptor();
     DoHttpThreadImpl();
     LOG("%s", "HttpThread terminated");
 }

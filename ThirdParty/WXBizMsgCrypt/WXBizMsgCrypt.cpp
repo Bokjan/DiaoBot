@@ -405,8 +405,6 @@ int WXBizMsgCrypt::ValidateSignature(const std::string &sMsgSignature, const std
     {
         return -1;
     }
-    puts(sMsgSignature.c_str());
-    puts(sSignature.c_str());
     
     if( sMsgSignature != sSignature)
     {

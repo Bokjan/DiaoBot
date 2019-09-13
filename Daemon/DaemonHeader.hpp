@@ -28,6 +28,8 @@ void KillDiaoBotDaemon(void);
 
 void GracefulSignalHandler(int signal);
 
+void SetupCryptor(void);
+
 using HttpRequestHandler = std::string*(*)(SimpleHttpMessage*);
 
 std::string* CallbackHandler(SimpleHttpMessage *msg);
