@@ -1,5 +1,15 @@
 #pragma once
 
+#include <string>
+
+struct SimpleHttpMessage
+{
+    std::string Method;
+    std::string URI;
+    std::string QueryString;
+    std::string Body;
+};
+
 namespace DiaoBot
 {
 
@@ -17,6 +27,10 @@ extern volatile bool IsKilled;
 void KillDiaoBotDaemon(void);
 
 void GracefulSignalHandler(int signal);
+
+using HttpRequestHandler = std::string*(*)(SimpleHttpMessage*);
+
+std::string* CallbackHandler(SimpleHttpMessage *msg);
 
 }
 

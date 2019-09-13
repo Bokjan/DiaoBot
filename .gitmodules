@@ -10,3 +10,6 @@
 [submodule "ThirdParty/URLDecode"]
 	path = ThirdParty/URLDecode
 	url = https://github.com/abejfehr/URLDecode
+[submodule "ThirdParty/mongoose"]
+	path = ThirdParty/mongoose
+	url = https://github.com/cesanta/mongoose
