@@ -48,6 +48,7 @@ static void EventHandler(mg_connection *c, int event, void *data)
             msg->Method = std::string(hm->method.p, hm->method.len);
             msg->QueryString = std::string(hm->query_string.p, hm->query_string.len);
             msg->URI = std::string(hm->uri.p, hm->uri.len);
+            LOG("req:\n%s", hm->message.p);
             WorkRequest req;
             req.Connection = c;
             req.Message = msg;
@@ -74,7 +75,8 @@ static void OnWorkComplete(mg_connection *c, int event, void *data)
     else
     {
         mg_printf(c, "%s", "HTTP/1.1 200 OK\r\nServer: DiaoBotHttp\r\n\r\n");
-        mg_printf(c, "%s", res->ResponseBody->c_str());
+        if (!res->ResponseBody->empty())
+            mg_printf(c, "%s", res->ResponseBody->c_str());
     }
     c->flags |= MG_F_SEND_AND_CLOSE;
     delete res->ResponseBody;

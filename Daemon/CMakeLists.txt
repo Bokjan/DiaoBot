@@ -17,7 +17,6 @@ FILE(GLOB APP_SOURCES "./*.cpp")
 SET(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-DMG_ENABLE_THREADS=1")
 SET(APP_SOURCES ${APP_SOURCES} "../ThirdParty/mongoose/mongoose.c")
 SET(APP_SOURCES ${APP_SOURCES} "../ThirdParty/URLDecode/urldecode.c")
-SET(APP_SOURCES ${APP_SOURCES} "../ThirdParty/tinyxml2/tinyxml2.cpp")
 SET(APP_SOURCES ${APP_SOURCES} "../ThirdParty/WXBizMsgCrypt/WXBizMsgCrypt.cpp")
 
 ADD_EXECUTABLE(diaobotd ${APP_SOURCES})

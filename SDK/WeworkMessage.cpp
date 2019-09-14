@@ -6,6 +6,7 @@
 #include "WeworkMessage.hpp"
 #include "../ThirdParty/md5/src/md5.h"
 #include "../ThirdParty/cpp-base64/base64.h"
+#include "../ThirdParty/tinyxml2/tinyxml2.h"
 
 namespace DiaoBot
 {
@@ -15,6 +16,11 @@ const string WeworkMessage::ALL_GROUP       = "@all_group";
 const string WeworkMessage::ALL_SUBSCRIBER  = "@all_subscriber";
 
 WeworkMessage::~WeworkMessage(void) { }
+
+string WeworkMessage::GetXml(void) const 
+{
+    return string();
+}
 
 void WeworkMessage::SetChatID(const string &chatid)
 {
@@ -63,6 +69,54 @@ void WeworkTextMessage::AddMentioned(const string &m)
 void WeworkTextMessage::AddMentionedMobile(const string &m)
 {
     PImpl->MentionedMobileList.emplace_back(m);
+}
+
+// tinyxml2 is shit.
+string WeworkTextMessage::GetXml(void) const
+{
+    tinyxml2::XMLDocument doc;
+    auto root = doc.NewElement("xml");
+    doc.InsertFirstChild(root);
+    auto msgtype = doc.NewElement("MsgType");
+    msgtype->SetText("text");
+    root->InsertFirstChild(msgtype);
+    auto text = doc.NewElement("Text");
+    text->SetName("Text");
+    root->InsertEndChild(text);
+    auto content = doc.NewElement("Content");
+    auto content_cdata = doc.NewText(this->PImpl->Content.c_str());
+    content_cdata->SetCData(true);
+    content->InsertFirstChild(content_cdata);
+    text->InsertEndChild(content);
+    if (!PImpl->MentionedList.empty())
+    {
+        auto list = doc.NewElement("MentionedList");
+        for (const auto &i : PImpl->MentionedList)
+        {
+            auto item = doc.NewElement("Item");
+            auto item_cdata = doc.NewText(i.c_str());
+            item_cdata->SetCData(true);
+            item->InsertEndChild(item_cdata);
+            list->InsertEndChild(item);
+        }
+        root->InsertEndChild(list);
+    }
+    if (!PImpl->MentionedMobileList.empty())
+    {
+        auto list = doc.NewElement("MentionedMobileList");
+        for (const auto &i : PImpl->MentionedMobileList)
+        {
+            auto item = doc.NewElement("Item");
+            auto item_cdata = doc.NewText(i.c_str());
+            item_cdata->SetCData(true);
+            item->InsertEndChild(item_cdata);
+            list->InsertEndChild(item);
+        }
+        root->InsertEndChild(list);
+    }
+    tinyxml2::XMLPrinter printer;
+    doc.Print(&printer);
+    return string(printer.CStr(), printer.CStrSize());
 }
 
 string WeworkTextMessage::GetJson(void) const
@@ -230,6 +284,27 @@ std::shared_ptr<WeworkMarkdownMessage::Attachment> WeworkMarkdownMessage::AddAtt
     auto ptr = std::make_shared<WeworkMarkdownMessage::Attachment>();
     PImpl->AttachmentPtrs.emplace_back(ptr);
     return ptr;
+}
+
+string WeworkMarkdownMessage::GetXml(void) const
+{
+    tinyxml2::XMLDocument doc;
+    auto root = doc.NewElement("xml");
+    doc.InsertFirstChild(root);
+    auto msgtype = doc.NewElement("MsgType");
+    msgtype->SetText("markdown");
+    root->InsertFirstChild(msgtype);
+    auto markdown = doc.NewElement("Markdown");
+    markdown->SetName("Markdown");
+    root->InsertEndChild(markdown);
+    auto content = doc.NewElement("Content");
+    auto content_cdata = doc.NewText(this->PImpl->Content.c_str());
+    content_cdata->SetCData(true);
+    content->InsertFirstChild(content_cdata);
+    markdown->InsertEndChild(content);
+    tinyxml2::XMLPrinter printer;
+    doc.Print(&printer);
+    return string(printer.CStr(), printer.CStrSize());
 }
 
 string WeworkMarkdownMessage::GetJson(void) const

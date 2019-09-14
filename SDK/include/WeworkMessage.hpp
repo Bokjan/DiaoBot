@@ -17,7 +17,8 @@ public:
     const static string ALL_GROUP;
     const static string ALL_SUBSCRIBER;
 
-    virtual ~WeworkMessage(void) = 0;
+    virtual ~WeworkMessage(void);
+    virtual string GetXml(void) const;
     virtual string GetJson(void) const = 0;
 
     void SetChatID(const string &chatid);
@@ -36,6 +37,7 @@ public:
     void AddMentioned(const string &m);
     void AddMentionedMobile(const string &m);
 
+    string GetXml(void) const override;
     string GetJson(void) const override;
 
 private:
@@ -107,6 +109,7 @@ public:
     bool SetContent(const string &c);
     std::shared_ptr<Attachment> AddAttachment(void);
 
+    string GetXml(void) const override;
     string GetJson(void) const override;
 
 private:
