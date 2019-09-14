@@ -85,7 +85,7 @@ void OnMessageReceived(SimpleHttpMessage *msg, string *ret)
         cbmsg = std::make_shared<CallbackEventMessage>(root);
     else if (strcmp(msgtype->GetText(), "attachment") == 0)
         cbmsg = std::make_shared<CallbackAttachmentMessage>(root);
-    else
+    if (cbmsg == nullptr || cbmsg->HasExtractError)
     {
         *ret = "Invalid request";
         return;
