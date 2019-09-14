@@ -100,7 +100,10 @@ void OnMessageReceived(SimpleHttpMessage *msg, string *ret)
         break;
     }
     if (rmsg == nullptr)
+    {
+        ret->clear();
         return;
+    }
     Cryptor->EncryptMsg(rmsg->GetXml(), qsmap["timestamp"], qsmap["nonce"], *ret);
 }
 

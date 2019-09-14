@@ -35,9 +35,9 @@ CallbackMessage::CallbackMessage(tinyxml2::XMLElement *xml):
         p = xml->FirstChildElement("ChatType");
         if (p == nullptr)
             break;
-        if (strcmp(p->GetText(), "single"))
+        if (strcmp(p->GetText(), "single") == 0)
             ChatType = SINGLE;
-        else if (strcmp(p->GetText(), "group"))
+        else if (strcmp(p->GetText(), "group") == 0)
             ChatType = GROUP;
         else
             break;
@@ -45,11 +45,11 @@ CallbackMessage::CallbackMessage(tinyxml2::XMLElement *xml):
         p = xml->FirstChildElement("MsgType");
         if (p == nullptr)
             break;
-        if (strcmp(p->GetText(), "text"))
+        if (strcmp(p->GetText(), "text") == 0)
             MsgType = TEXT;
-        else if (strcmp(p->GetText(), "event"))
+        else if (strcmp(p->GetText(), "event") == 0)
             MsgType = EVENT;
-        else if (strcmp(p->GetText(), "attachment"))
+        else if (strcmp(p->GetText(), "attachment") == 0)
             MsgType = ATTACHMENT;
         else
             break;
