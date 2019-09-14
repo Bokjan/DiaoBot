@@ -3,6 +3,7 @@
 #include <list>
 #include <mutex>
 #include "Runnable.hpp"
+#include "Replyable.hpp"
 #include "CronConfig.hpp"
 
 namespace DiaoBot
@@ -17,14 +18,22 @@ struct CronJob
         LibID(id), Config(config), Task(runnable) { }
 };
 
+struct ReplyMaker
+{
+    unsigned int LibID;
+    ReplyablePtr Maker;
+    ReplyMaker(unsigned int id, ReplyablePtr &rptr):
+        LibID(id), Maker(rptr) { }
+};
+
 class BotEngineImpl
 {
-    friend class    BotEngine;
-    friend void     DoCronThread(void);
-
-    string              WebhookUrl;
-    std::mutex          CronJobListMutex;
-    std::list<CronJob>  CronJobList;
+public:
+    string                  WebhookUrl;
+    std::mutex              CronJobListMutex;
+    std::mutex              ReplyMakerListMutex;
+    std::list<CronJob>      CronJobList;
+    std::list<ReplyMaker>   ReplyMakerList;
 };
 
 }

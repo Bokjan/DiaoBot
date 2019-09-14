@@ -48,7 +48,6 @@ static void EventHandler(mg_connection *c, int event, void *data)
             msg->Method = std::string(hm->method.p, hm->method.len);
             msg->QueryString = std::string(hm->query_string.p, hm->query_string.len);
             msg->URI = std::string(hm->uri.p, hm->uri.len);
-            LOG("req:\n%s", hm->message.p);
             WorkRequest req;
             req.Connection = c;
             req.Message = msg;

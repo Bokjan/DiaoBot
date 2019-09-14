@@ -142,6 +142,26 @@ void BotEngine::DestroyCronJobs(unsigned int libid)
     PImpl->CronJobListMutex.unlock();
 }
 
+void BotEngine::RegisterReplyMaker(unsigned int libid, ReplyablePtr replyable)
+{
+    PImpl->ReplyMakerListMutex.lock();
+    PImpl->ReplyMakerList.push_back(ReplyMaker(libid, replyable));
+    PImpl->ReplyMakerListMutex.unlock();
+}
+
+void BotEngine::DestroyReplyMakers(unsigned int libid)
+{
+    PImpl->ReplyMakerListMutex.lock();
+    for (auto it = PImpl->ReplyMakerList.begin(); it != PImpl->ReplyMakerList.end(); ++it)
+    {
+        if (it->LibID == libid)
+        {
+            PImpl->ReplyMakerList.erase(it++);
+        }
+    }
+    PImpl->ReplyMakerListMutex.unlock();
+}
+
 HttpResponse BotEngine::HttpGetRequest(const string &url, bool proxy)
 {
     HttpResponse ret;

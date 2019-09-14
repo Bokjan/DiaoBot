@@ -1,8 +1,11 @@
 #include <map>
 #include <memory>
 #include "Log.hpp"
+#include "BotEngine.hpp"
+#include "BotEngineImpl.hpp"
 #include "DaemonHeader.hpp"
 #include "TfcConfigCodec.hpp"
+#include "WeworkMessage.hpp"
 #include "CallbackMessage.hpp"
 #include "../ThirdParty/WXBizMsgCrypt/WXBizMsgCrypt.hpp"
 
@@ -37,7 +40,7 @@ static void DoVerifyURL(SimpleHttpMessage *msg, string *ret)
 }
 
 
-static void OnMessageReceived(SimpleHttpMessage *msg, string *ret)
+void OnMessageReceived(SimpleHttpMessage *msg, string *ret)
 {
     ret->clear();
     std::map<string, string> qsmap;
@@ -48,16 +51,15 @@ static void OnMessageReceived(SimpleHttpMessage *msg, string *ret)
             continue;
         qsmap.insert(std::make_pair(string(i.c_str(), pos), string(i.c_str() + pos + 1, i.length() - pos - 1)));
     }
-    // string encrypted = doc.FirstChildElement("xml")->FirstChildElement("Encrypt")->GetText();
     string decrypted;
     int retcode = Cryptor->DecryptMsg(qsmap["msg_signature"], qsmap["timestamp"], qsmap["nonce"], msg->Body, decrypted);
     if (retcode != 0)
     {
         *ret = "Decrypt failed!";
-        LOG("%s%d", "Decrypt failed, retcode=", retcode);
+        // LOG("%s%d", "Decrypt failed, retcode=", retcode);
         return;
     }
-    LOG("decrypted:\n%s", decrypted.c_str());
+    // LOG("decrypted:\n%s", decrypted.c_str());
     tinyxml2::XMLDocument doc;
     if (doc.Parse(decrypted.c_str(), decrypted.length()) != 0)
     {
@@ -88,6 +90,18 @@ static void OnMessageReceived(SimpleHttpMessage *msg, string *ret)
         *ret = "Invalid request";
         return;
     }
+    // Select a reply maker
+    std::shared_ptr<WeworkMessage> rmsg = nullptr;
+    for (auto &i : BotEngine::GetInstance().PImpl->ReplyMakerList)
+    {
+        if (!i.Maker->WillReply(cbmsg))
+            continue;
+        rmsg = i.Maker->Reply(cbmsg);
+        break;
+    }
+    if (rmsg == nullptr)
+        return;
+    Cryptor->EncryptMsg(rmsg->GetXml(), qsmap["timestamp"], qsmap["nonce"], *ret);
 }
 
 string* CallbackHandler(SimpleHttpMessage *msg)
