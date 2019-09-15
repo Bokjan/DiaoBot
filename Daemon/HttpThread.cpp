@@ -103,6 +103,8 @@ static void * HttpWorkerThread(void *param)
         res.ResponseBody = nullptr;
         if (req.Message->URI == "/callback")
             res.ResponseBody = CallbackHandler(req.Message);
+        else if (req.Message->URI == "/ping")
+            res.ResponseBody = new string("PONG!");
         delete req.Message;
         mg_broadcast(mgr, OnWorkComplete, reinterpret_cast<void*>(&res), sizeof(res));
     }

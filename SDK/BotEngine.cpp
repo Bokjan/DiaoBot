@@ -1,4 +1,5 @@
 #include <list>
+#include <string>
 #include <cstdlib>
 #include <curl/curl.h>
 #include <rapidjson/document.h>
@@ -6,6 +7,8 @@
 #include "BotEngine.hpp"
 #include "BotEngineImpl.hpp"
 #include "WeworkMessage.hpp"
+
+using std::string;
 
 namespace DiaoBot
 {
@@ -216,6 +219,11 @@ int BotEngine::SendMessage(const WeworkMessage &message)
     }
     while (false);
     return ret;
+}
+
+BotEngineImpl* GetEngineImpl(void)
+{
+    return BotEngine::GetInstance().PImpl;
 }
 
 }

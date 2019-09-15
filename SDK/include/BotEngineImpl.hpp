@@ -2,9 +2,12 @@
 
 #include <list>
 #include <mutex>
+#include <string>
 #include "Runnable.hpp"
 #include "Replyable.hpp"
 #include "CronConfig.hpp"
+
+using std::string;
 
 namespace DiaoBot
 {
@@ -35,5 +38,7 @@ public:
     std::list<CronJob>      CronJobList;
     std::list<ReplyMaker>   ReplyMakerList;
 };
+
+BotEngineImpl* GetEngineImpl(void);
 
 }

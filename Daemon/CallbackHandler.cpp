@@ -1,7 +1,6 @@
 #include <map>
 #include <memory>
 #include "Log.hpp"
-#include "BotEngine.hpp"
 #include "BotEngineImpl.hpp"
 #include "DaemonHeader.hpp"
 #include "TfcConfigCodec.hpp"
@@ -92,7 +91,7 @@ void OnMessageReceived(SimpleHttpMessage *msg, string *ret)
     }
     // Select a reply maker
     std::shared_ptr<WeworkMessage> rmsg = nullptr;
-    for (auto &i : BotEngine::GetInstance().PImpl->ReplyMakerList)
+    for (auto &i : GetEngineImpl()->ReplyMakerList)
     {
         if (!i.Maker->WillReply(cbmsg))
             continue;

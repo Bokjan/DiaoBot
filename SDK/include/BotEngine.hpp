@@ -45,8 +45,7 @@ private:
     BotEngineImpl *PImpl;
     BotEngine(void);
     static BotEngine Instance;
-    friend void DoCronThread(void);
-    friend void OnMessageReceived(SimpleHttpMessage*, string*);
+    friend BotEngineImpl* GetEngineImpl(void);
 };
 
 }

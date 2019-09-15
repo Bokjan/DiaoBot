@@ -1,10 +1,12 @@
 #include <ctime>
 #include <chrono>
 #include <thread>
+#include <string>
 #include "Log.hpp"
 #include "DaemonHeader.hpp"
-#include "BotEngine.hpp"
 #include "BotEngineImpl.hpp"
+
+using std::string;
 
 namespace DiaoBot
 {
@@ -43,7 +45,7 @@ void DoCronThread(void)
         time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         tm *tmptr = localtime(&t);
         // Emit jobs
-        DoLoop(BotEngine::GetInstance().PImpl->CronJobList, tmptr);
+        DoLoop(GetEngineImpl()->CronJobList, tmptr);
         // Set to next minute
         ++tmptr->tm_min;
         tmptr->tm_sec = 0;
