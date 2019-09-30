@@ -4,19 +4,18 @@ set -o errexit
 
 cd `dirname $0`
 SCRIPT_PATH=`pwd`/
-
-#THIRD_BUILDS_PREFIX="/data/builds/"
+CORE_COUNT=`grep 'processor' /proc/cpuinfo | sort -u | wc -l`
 
 mkdir -p SDK/build
 mkdir -p Daemon/build
 
 cd SDK/build
 cmake .. -DCMAKE_BUILD_TYPE=RELEASE
-make -j7
-make install
+make -j${CORE_COUNT}
+sudo make install
 # cp libdiaobot.so ../../Dist
 
 cd ../../Daemon/build
-cmake .. -DCMAKE_BUILD_TYPE=RELEASE #-DTHIRD_BUILDS_PREFIX="/data/builds/"
-make -j7
+cmake .. -DCMAKE_BUILD_TYPE=RELEASE
+make -j${CORE_COUNT}
 cp diaobotd ../../Dist

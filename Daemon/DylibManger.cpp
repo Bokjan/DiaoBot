@@ -50,7 +50,7 @@ unsigned int DylibManager::GetLibraryID(const string &name)
     return f->second.LibID;
 }
 
-void DylibManager::LoadLibrary(const string &path, const string &name) throw (std::runtime_error)
+void DylibManager::LoadLibrary(const string &path, const string &name)
 {
     if (PImpl->Map.find(name) != PImpl->Map.end())
         throw std::runtime_error(name + " library already loaded");
@@ -67,7 +67,7 @@ void DylibManager::LoadLibrary(const string &path, const string &name) throw (st
     PImpl->Map.insert(std::make_pair(name, di));
 }
 
-void DylibManager::UnloadLibrary(const string &name) throw (std::runtime_error)
+void DylibManager::UnloadLibrary(const string &name)
 {
     auto f = PImpl->Map.find(name);
     if (f == PImpl->Map.end())
@@ -80,7 +80,7 @@ void DylibManager::UnloadLibrary(const string &name) throw (std::runtime_error)
         throw std::runtime_error(error);
 }
 
-void DylibManager::ReloadLibrary(const string &path, const string &name) throw (std::runtime_error)
+void DylibManager::ReloadLibrary(const string &path, const string &name)
 {
     auto f = PImpl->Map.find(name);
     if (f == PImpl->Map.end())
