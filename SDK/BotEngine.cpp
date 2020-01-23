@@ -145,10 +145,10 @@ void BotEngine::DestroyCronJobs(unsigned int libid)
     PImpl->CronJobListMutex.unlock();
 }
 
-void BotEngine::RegisterReplyMaker(unsigned int libid, ReplyablePtr replyable)
+void BotEngine::RegisterReplyMaker(unsigned int libid, CreateReplyableFunc func)
 {
     PImpl->ReplyMakerListMutex.lock();
-    PImpl->ReplyMakerList.push_back(ReplyMaker(libid, replyable));
+    PImpl->ReplyMakerList.push_back(ReplyMaker(libid, func));
     PImpl->ReplyMakerListMutex.unlock();
 }
 

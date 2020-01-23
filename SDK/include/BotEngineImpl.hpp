@@ -24,9 +24,9 @@ struct CronJob
 struct ReplyMaker
 {
     unsigned int LibID;
-    ReplyablePtr Maker;
-    ReplyMaker(unsigned int id, ReplyablePtr &rptr):
-        LibID(id), Maker(rptr) { }
+    CreateReplyableFunc CreateReplyable;
+    ReplyMaker(unsigned int id, CreateReplyableFunc func):
+        LibID(id), CreateReplyable(func) { }
 };
 
 class BotEngineImpl

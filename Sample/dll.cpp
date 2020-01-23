@@ -25,5 +25,8 @@ void DB_Bind(unsigned int libid)
         DiaoBot::BotEngine::GetInstance().RegisterCronJob(LibraryID, cc, task);
     } while (false);
     // 注册一个回调处理器
-    DiaoBot::BotEngine::GetInstance().RegisterReplyMaker(LibraryID, std::make_shared<Sample::CallbackEchoSample>());
+    DiaoBot::BotEngine::GetInstance().RegisterReplyMaker(LibraryID, []()
+    {
+        return std::make_shared<Sample::CallbackEchoSample>();
+    });
 }

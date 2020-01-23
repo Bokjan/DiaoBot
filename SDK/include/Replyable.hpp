@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <functional>
 
 namespace DiaoBot
 {
@@ -17,5 +18,6 @@ public:
 };
 
 using ReplyablePtr = std::shared_ptr<Replyable>;
+using CreateReplyableFunc = std::function<ReplyablePtr(void)>;
 
 }

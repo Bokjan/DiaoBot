@@ -93,9 +93,10 @@ void OnMessageReceived(SimpleHttpMessage *msg, string *ret)
     std::shared_ptr<WeworkMessage> rmsg = nullptr;
     for (auto &i : GetEngineImpl()->ReplyMakerList)
     {
-        if (!i.Maker->WillReply(cbmsg))
+        auto logicptr = i.CreateReplyable();
+        if (!logicptr->WillReply(cbmsg))
             continue;
-        rmsg = i.Maker->Reply(cbmsg);
+        rmsg = logicptr->Reply(cbmsg);
         break;
     }
     if (rmsg == nullptr)

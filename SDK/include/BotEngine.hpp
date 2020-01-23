@@ -35,7 +35,7 @@ public:
     void DestroyCronJobs(RunnablePtr runnable); // 销毁全部对应Runnable的任务
     void DestroyCronJobs(unsigned int libid); // 销毁某动态库下的任务
 
-    void RegisterReplyMaker(unsigned int libid, ReplyablePtr replyable);
+    void RegisterReplyMaker(unsigned int libid, CreateReplyableFunc func);
     void DestroyReplyMakers(unsigned int libid); // 销毁某动态库下的回调处理器
 
     HttpResponse HttpGetRequest(const string &url, bool proxy = true);
