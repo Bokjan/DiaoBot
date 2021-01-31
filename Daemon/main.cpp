@@ -21,8 +21,7 @@ int main(int argc, char *argv[]) {
 
   // DAEMON?
   string pid_file;
-  if (argc > 2)  // not daemon
-  {
+  if (argc > 2) {  // not daemon
     LOG("%s: foreground mode", argv[0]);
     DoMain();
   } else {
@@ -42,13 +41,11 @@ int main(int argc, char *argv[]) {
         break;
       }
       pid_t prev_pid;
-      if (sscanf(pid_string.c_str(), "%d", &prev_pid) != 1)  // Cannot read a PID integer
-      {
+      if (sscanf(pid_string.c_str(), "%d", &prev_pid) != 1) {  // Cannot read a PID integer
         LOG("PID file %s contains no integer!", pid_file.c_str());
         exit(EXIT_FAILURE);
       }
-      if (kill(prev_pid, 0) == 0)  // exist
-      {
+      if (kill(prev_pid, 0) == 0) {  // exist
         LOG("Process with PID %d is running, daemon start failed", prev_pid);
         exit(EXIT_FAILURE);
       }
