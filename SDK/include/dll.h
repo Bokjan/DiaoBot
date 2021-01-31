@@ -2,10 +2,8 @@
 
 extern unsigned int LibraryID;
 
-extern "C" 
-{
+extern "C" {
 
-const char * DB_DllName(void);
-void         DB_Bind(unsigned int libid);
-
-} 
+const char *DB_DllName(void);
+void DB_Bind(unsigned int libid);
+}

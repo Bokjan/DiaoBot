@@ -1,18 +1,16 @@
 #pragma once
 
-#include <string>
 #include <condition_variable>
+#include <string>
 
-struct SimpleHttpMessage
-{
-    std::string Method;
-    std::string URI;
-    std::string QueryString;
-    std::string Body;
+struct SimpleHttpMessage {
+  std::string Method;
+  std::string URI;
+  std::string QueryString;
+  std::string Body;
 };
 
-namespace DiaoBot
-{
+namespace DiaoBot {
 
 class TfcConfigCodec;
 extern TfcConfigCodec MainConf;
@@ -34,11 +32,11 @@ void GracefulSignalHandler(int signal);
 
 void SetupCryptor(void);
 
-using HttpRequestHandler = std::string*(*)(SimpleHttpMessage*);
+using HttpRequestHandler = std::string *(*)(SimpleHttpMessage *);
 
-std::string* CallbackHandler(SimpleHttpMessage *msg);
+std::string *CallbackHandler(SimpleHttpMessage *msg);
 
-}
+}  // namespace DiaoBot
 
 // for 3rd-party `URLDecode`
 extern "C" char *urlDecode(const char *str);
