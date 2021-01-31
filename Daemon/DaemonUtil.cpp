@@ -11,6 +11,8 @@ namespace DiaoBot
 
 TfcConfigCodec MainConf;
 volatile bool IsKilled = false;
+std::condition_variable ThreadSleepCV;
+std::mutex ThreadSleepCVMutex;
 
 void PrintUsage(const char *argv0)
 {
@@ -19,7 +21,11 @@ void PrintUsage(const char *argv0)
 
 void KillDiaoBotDaemon(void)
 {
-    IsKilled = true;
+    {
+        std::lock_guard<std::mutex> lock(ThreadSleepCVMutex);
+        IsKilled = true;
+    }
+    ThreadSleepCV.notify_all();
 }
 
 void GracefulSignalHandler(int signal)

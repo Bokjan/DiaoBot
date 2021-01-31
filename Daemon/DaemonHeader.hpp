@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <condition_variable>
 
 struct SimpleHttpMessage
 {
@@ -16,6 +17,10 @@ namespace DiaoBot
 class TfcConfigCodec;
 extern TfcConfigCodec MainConf;
 
+extern volatile bool IsKilled;
+extern std::condition_variable ThreadSleepCV;
+extern std::mutex ThreadSleepCVMutex;
+
 void PrintUsage(const char *argv0);
 void LoadSharedObjects(void);
 void InitializeBotEngine(void);
@@ -23,7 +28,6 @@ void InitializeBotEngine(void);
 void DoCronThread(void);
 void DoHttpThread(void);
 
-extern volatile bool IsKilled;
 void KillDiaoBotDaemon(void);
 
 void GracefulSignalHandler(int signal);

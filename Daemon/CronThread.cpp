@@ -39,8 +39,14 @@ static void DoLoop(std::list<CronJob> &list, tm *now)
 void DoCronThread(void)
 {
     LOG("%s", "CronThread started");
-    while (!IsKilled)
+    std::unique_lock<std::mutex> lk(ThreadSleepCVMutex);
+    decltype(std::chrono::system_clock::now()) time_point;
+    do 
     {
+        if (IsKilled)
+        {
+            break;
+        }
         // Get current time
         time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         tm *tmptr = localtime(&t);
@@ -49,8 +55,8 @@ void DoCronThread(void)
         // Set to next minute
         ++tmptr->tm_min;
         tmptr->tm_sec = 0;
-        std::this_thread::sleep_until(std::chrono::system_clock::from_time_t(mktime(tmptr)));
-    }
+        time_point = std::chrono::system_clock::from_time_t(mktime(tmptr));
+    } while (ThreadSleepCV.wait_until(lk, time_point) == std::cv_status::timeout);
     LOG("%s", "CronThread terminated");
 }
 
