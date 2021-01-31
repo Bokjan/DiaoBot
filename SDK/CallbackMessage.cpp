@@ -56,7 +56,8 @@ CallbackMessage::CallbackMessage(tinyxml2::XMLElement *xml)
       MsgType = ATTACHMENT;
     } else {
       break;
-    }  // From
+    }  
+    // From
     p = xml->FirstChildElement("From");
     auto q = p->FirstChildElement("UserId");
     if (q == nullptr) {
