@@ -9,9 +9,13 @@ string ReadFile(const char *filename) {
   string ret;
   char buf[1024];
   FILE *fp = fopen(filename, "r");
-  if (fp == nullptr) return string();
+  if (fp == nullptr) {
+    return string();
+  }
   size_t len;
-  while ((len = fread(buf, 1, 1024, fp)) != 0) ret.append(buf, len);
+  while ((len = fread(buf, 1, 1024, fp)) != 0) {
+    ret.append(buf, len);
+  }
   fclose(fp);
   return ret;
 }
@@ -51,8 +55,11 @@ static const char *SpaceTable[] = {"",
 
 inline static const char *GetLeadingSpaces(const string &s) {
   int count = 0;
-  for (auto i : s)
-    if (i == '\\') ++count;
+  for (auto i : s) {
+    if (i == '\\') {
+      ++count;
+    }
+  }
   return SpaceTable[count];
 }
 
@@ -62,7 +69,9 @@ std::list<string> SplitString(const string &s, char delimeter) {
   string i;
   std::list<string> list;
   std::stringstream ss(s);
-  while (std::getline(ss, i, delimeter)) list.push_back(i);
+  while (std::getline(ss, i, delimeter)) {
+    list.push_back(i);
+  }
   return list;
 }
 
@@ -77,10 +86,14 @@ class TfcConfigCodecImpl {
 
   LineType DetectLineType(const string &line) {
     if (line[0] == '<') {
-      if (line.back() != '>') return LineType::ERROR;
+      if (line.back() != '>') {
+        return LineType::ERROR;
+      }
       return line[1] == '/' ? LineType::SECTION_END : LineType::SECTION_BEGIN;
     }
-    if (line.find('=') != string::npos) return LineType::KVPAIR;
+    if (line.find('=') != string::npos) {
+      return LineType::KVPAIR;
+    }
     return LineType::ERROR;
   }
 
@@ -88,10 +101,13 @@ class TfcConfigCodecImpl {
     int ret = TfcConfigCodec::SUCCESS;
     for (string line; std::getline(iss, line);) {
       Trim(line);
-      if (line.length() == 0) continue;
+      if (line.length() == 0) {
+        continue;
+      }
       if (line[0] == '#') {
-        if (this->CommentedNodeStack.size() == 0)
+        if (this->CommentedNodeStack.size() == 0) {
           return TfcConfigCodec::PARSE_FAIL_SECTION_TAG_NOT_MATCH;
+        }
         this->CommentedNodeStack.back()->AddComment(line);
         continue;
       }
@@ -102,22 +118,26 @@ class TfcConfigCodecImpl {
           auto v = TrimCopy(line.c_str() + pos + 1);
           node.Pairs.push_back(KVPair(k, v));
           this->CommentedNodeStack.pop_back();
-          this->CommentedNodeStack.push_back((TfcConfigCodec::CommentedNode *)&node.Pairs.back());
+          this->CommentedNodeStack.push_back(
+              static_cast<TfcConfigCodec::CommentedNode *>(&node.Pairs.back()));
           break;
         }
         case TfcConfigCodecImpl::LineType::SECTION_BEGIN: {
           node.Children.push_back(Node());
           auto &ref = node.Children.back();
-          this->CommentedNodeStack.push_back((TfcConfigCodec::CommentedNode *)&ref);
+          this->CommentedNodeStack.push_back(static_cast<TfcConfigCodec::CommentedNode *>(&ref));
           ref.Level = node.Level + 1;
           ref.Tag = line.substr(1, line.length() - 2);
           ret = this->ParseImpl(iss, ref);
-          if (ret != TfcConfigCodec::SUCCESS) return ret;
+          if (ret != TfcConfigCodec::SUCCESS) {
+            return ret;
+          }
           break;
         }
         case TfcConfigCodecImpl::LineType::SECTION_END:
-          if (line.substr(2, line.length() - 3) != node.Tag)
+          if (line.substr(2, line.length() - 3) != node.Tag) {
             return TfcConfigCodec::PARSE_FAIL_SECTION_TAG_NOT_MATCH;
+          }
           this->CommentedNodeStack.pop_back();
           return TfcConfigCodec::SUCCESS;
         case TfcConfigCodecImpl::LineType::ERROR:
@@ -162,15 +182,20 @@ class TfcConfigCodecImpl {
           break;
         }
       }
-      if (!is_found) return nullptr;
+      if (!is_found) {
+        return nullptr;
+      }
     }
     return p;
   }
 
   KVPair *GetKVPairPointer(const char *section, const char *key) {
     auto p = GetSectionPointer(section);
-    for (auto &i : p->Pairs)
-      if (i.Key == key) return &i;
+    for (auto &i : p->Pairs) {
+      if (i.Key == key) {
+        return &i;
+      }
+    }
     return nullptr;
   }
 
@@ -199,7 +224,9 @@ int TfcConfigCodec::Parse(const char *str) {
 
 int TfcConfigCodec::ParseFile(const char *filename) {
   auto str = ReadFile(filename);
-  if (str.length() == 0) return CANNOT_OPEN_FILE;
+  if (str.length() == 0) {
+    return CANNOT_OPEN_FILE;
+  }
   return this->Parse(str.c_str());
 }
 
@@ -228,16 +255,22 @@ TfcConfigCodec::Node &TfcConfigCodec::GetSection(const char *section) {
 
 int TfcConfigCodec::ClearKVs(const char *section) {
   auto p = PImpl->GetSectionPointer(section);
-  if (p == nullptr) return SECTION_NOT_FOUND;
+  if (p == nullptr) {
+    return SECTION_NOT_FOUND;
+  }
   p->Pairs.clear();
   return SUCCESS;
 }
 
 int TfcConfigCodec::EraseKV(const char *section, const char *key) {
   auto p = PImpl->GetSectionPointer(section);
-  if (p == nullptr) return SECTION_NOT_FOUND;
+  if (p == nullptr) {
+    return SECTION_NOT_FOUND;
+  }
   for (auto it = p->Pairs.begin(); it != p->Pairs.end(); ++it) {
-    if (it->Key != key) continue;
+    if (it->Key != key) {
+      continue;
+    }
     p->Pairs.erase(it);
     return SUCCESS;
   }
@@ -246,16 +279,23 @@ int TfcConfigCodec::EraseKV(const char *section, const char *key) {
 
 int TfcConfigCodec::InsertKV(const char *section, const char *key, const char *value) {
   auto p = PImpl->GetSectionPointer(section);
-  if (p == nullptr) return SECTION_NOT_FOUND;
-  for (const auto &i : p->Pairs)
-    if (i.Key == key) return KVPAIR_DUPLICATED;
+  if (p == nullptr) {
+    return SECTION_NOT_FOUND;
+  }
+  for (const auto &i : p->Pairs) {
+    if (i.Key == key) {
+      return KVPAIR_DUPLICATED;
+    }
+  }
   p->Pairs.push_back(KVPair(key, value));
   return SUCCESS;
 }
 
 int TfcConfigCodec::OverwriteKV(const char *section, const char *key, const char *value) {
   auto p = PImpl->GetSectionPointer(section);
-  if (p == nullptr) return SECTION_NOT_FOUND;
+  if (p == nullptr) {
+    return SECTION_NOT_FOUND;
+  }
   for (auto &i : p->Pairs) {
     if (i.Key == key) {
       i.Value = value;
@@ -267,28 +307,36 @@ int TfcConfigCodec::OverwriteKV(const char *section, const char *key, const char
 
 int TfcConfigCodec::ClearRawLines(const char *section) {
   auto p = PImpl->GetSectionPointer(section);
-  if (p == nullptr) return SECTION_NOT_FOUND;
+  if (p == nullptr) {
+    return SECTION_NOT_FOUND;
+  }
   p->RawLines.clear();
   return SUCCESS;
 }
 
 int TfcConfigCodec::InsertRawLine(const char *section, const char *line) {
   auto p = PImpl->GetSectionPointer(section);
-  if (p == nullptr) return SECTION_NOT_FOUND;
+  if (p == nullptr) {
+    return SECTION_NOT_FOUND;
+  }
   p->RawLines.push_back(line);
   return SUCCESS;
 }
 
 int TfcConfigCodec::ClearSections(const char *parent) {
   auto p = PImpl->GetSectionPointer(parent);
-  if (p == nullptr) return SECTION_NOT_FOUND;
+  if (p == nullptr) {
+    return SECTION_NOT_FOUND;
+  }
   p->Children.clear();
   return SUCCESS;
 }
 
 int TfcConfigCodec::EraseSection(const char *parent, const char *tag) {
   auto p = PImpl->GetSectionPointer(parent);
-  if (p == nullptr) return SECTION_NOT_FOUND;
+  if (p == nullptr) {
+    return SECTION_NOT_FOUND;
+  }
   for (auto it = p->Children.begin(); it != p->Children.end(); ++it) {
     if (it->Tag == tag) {
       p->Children.erase(it);
@@ -301,9 +349,10 @@ int TfcConfigCodec::EraseSection(const char *parent, const char *tag) {
 int TfcConfigCodec::InsertSection(const char *parent, const char *tag) {
   string full(parent);
   full.append("\\").append(tag);
-  if (this->HasSection(full.c_str())) return SECTION_DUPLICATED;
+  if (this->HasSection(full.c_str())) {
+    return SECTION_DUPLICATED;
+  }
   auto p = PImpl->GetSectionPointer(parent);
-  // elog("parent=%s, full=%s, p=%x", parent, full.c_str(), p);
   p->Children.push_back(Node());
   auto &r = p->Children.back();
   r.Tag = tag;

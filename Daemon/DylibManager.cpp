@@ -31,17 +31,22 @@ DylibManager &DylibManager::GetInstance(void) { return DylibManager::Instance; }
 
 unsigned int DylibManager::GetLibraryID(const string &name) {
   auto f = PImpl->Map.find(name);
-  if (f == PImpl->Map.end()) return 0;
+  if (f == PImpl->Map.end()) {
+    return 0;
+  }
   return f->second.LibID;
 }
 
 void DylibManager::LoadLibrary(const string &path, const string &name) {
-  if (PImpl->Map.find(name) != PImpl->Map.end())
+  if (PImpl->Map.find(name) != PImpl->Map.end()) {
     throw std::runtime_error(name + " library already loaded");
+  }
   dlerror();  // clear
   void *handle = dlopen(path.c_str(), RTLD_NOW);
   auto error = dlerror();
-  if (error != nullptr) throw std::runtime_error(error);
+  if (error != nullptr) {
+    throw std::runtime_error(error);
+  }
   MD5 somd5(ReadFile(path.c_str()));
   DylibInfo di;
   di.Handle = handle;
@@ -52,17 +57,23 @@ void DylibManager::LoadLibrary(const string &path, const string &name) {
 
 void DylibManager::UnloadLibrary(const string &name) {
   auto f = PImpl->Map.find(name);
-  if (f == PImpl->Map.end()) throw std::runtime_error(name + " library not found");
+  if (f == PImpl->Map.end()) {
+    throw std::runtime_error(name + " library not found");
+  }
   BotEngine::GetInstance().DestroyCronJobs(f->second.LibID);
   dlerror();  // clear
   dlclose(f->second.Handle);
   auto error = dlerror();
-  if (error != nullptr) throw std::runtime_error(error);
+  if (error != nullptr) {
+    throw std::runtime_error(error);
+  }
 }
 
 void DylibManager::ReloadLibrary(const string &path, const string &name) {
   auto f = PImpl->Map.find(name);
-  if (f == PImpl->Map.end()) goto LOAD;
+  if (f == PImpl->Map.end()) {
+    goto LOAD;
+  }
   this->UnloadLibrary(name);
 LOAD:
   this->LoadLibrary(path, name);
@@ -70,7 +81,10 @@ LOAD:
 
 void *DylibManager::GetSymbolImpl(const string &name, const string &symbol) {
   auto f = PImpl->Map.find(name);
-  if (f == PImpl->Map.end()) return nullptr;
+  if (f == PImpl->Map.end()) {
+    return nullptr;
+  }
   return dlsym(f->second.Handle, symbol.c_str());
 }
+
 }  // namespace DiaoBot

@@ -45,8 +45,9 @@ static void EventHandler(mg_connection *c, int event, void *data) {
       WorkRequest req;
       req.Connection = c;
       req.Message = msg;
-      if (write(sock[0], &req, sizeof(req)) < 0)
+      if (write(sock[0], &req, sizeof(req)) < 0) {
         LOG("Write sock failed, Connection=0x%p", req.Connection);
+      }
       break;
     }
     case MG_EV_CLOSE:
@@ -58,13 +59,17 @@ static void EventHandler(mg_connection *c, int event, void *data) {
 
 static void OnWorkComplete(mg_connection *c, int event, void *data) {
   auto res = reinterpret_cast<WorkResult *>(data);
-  if (c != res->Connection) return;
+  if (c != res->Connection) {
+    return;
+  }
   if (res->ResponseBody == nullptr) {
     mg_printf(c, "%s",
               "HTTP/1.1 501 Not Implemented\r\nServer: DiaoBotHttp\r\n\r\nNot implemented!\r\n");
   } else {
     mg_printf(c, "%s", "HTTP/1.1 200 OK\r\nServer: DiaoBotHttp\r\n\r\n");
-    if (!res->ResponseBody->empty()) mg_printf(c, "%s", res->ResponseBody->c_str());
+    if (!res->ResponseBody->empty()) {
+      mg_printf(c, "%s", res->ResponseBody->c_str());
+    }
   }
   c->flags |= MG_F_SEND_AND_CLOSE;
   delete res->ResponseBody;
@@ -75,21 +80,26 @@ static void *HttpWorkerThread(void *param) {
   auto mgr = reinterpret_cast<mg_mgr *>(param);
   WorkRequest req;
   while (!IsKilled) {
-    socklock.lock();
-    int readret = read(sock[1], &req, sizeof(req));
-    socklock.unlock();
+    int readret;
+    do {
+      std::lock_guard<std::mutex> lk(socklock);
+      readret = read(sock[1], &req, sizeof(req));
+    } while (false);
     if (readret < 0) {
       LOG("Read sock failed, tid = %ld", syscall(SYS_gettid));
       continue;
     }
-    if (readret != sizeof(req)) continue;
+    if (readret != sizeof(req)) {
+      continue;
+    }
     WorkResult res;
     res.Connection = req.Connection;
     res.ResponseBody = nullptr;
-    if (req.Message->URI == "/callback")
+    if (req.Message->URI == "/callback") {
       res.ResponseBody = CallbackHandler(req.Message);
-    else if (req.Message->URI == "/ping")
+    } else if (req.Message->URI == "/ping") {
       res.ResponseBody = new string("PONG!");
+    }
     delete req.Message;
     mg_broadcast(mgr, OnWorkComplete, reinterpret_cast<void *>(&res), sizeof(res));
   }
@@ -100,16 +110,24 @@ static void *HttpWorkerThread(void *param) {
 void DoHttpThreadImpl(void) {
   mg_mgr mgr;
   mg_connection *conn;
-  if (mg_socketpair(sock, SOCK_STREAM) == 0)
+  if (mg_socketpair(sock, SOCK_STREAM) == 0) {
     throw std::runtime_error("Cannot open mongoose socket pair");
+  }
   mg_mgr_init(&mgr, nullptr);
-  if (!MainConf.HasKV("root\\http", "port"))
+  if (!MainConf.HasKV("root\\http", "port")) {
     throw std::runtime_error("Config item `root\\http\\port` not found!");
+  }
   conn = mg_bind(&mgr, MainConf.GetKV("root\\http", "port").c_str(), EventHandler);
-  if (conn == nullptr) throw std::runtime_error("Cannot bind mongoose");
+  if (conn == nullptr) {
+    throw std::runtime_error("Cannot bind mongoose");
+  }
   mg_set_protocol_http_websocket(conn);
-  for (int i = 0; i < HTTP_WORKER_THREAD_NUM; ++i) mg_start_thread(HttpWorkerThread, &mgr);
-  while (!IsKilled) mg_mgr_poll(&mgr, 200);
+  for (int i = 0; i < HTTP_WORKER_THREAD_NUM; ++i) {
+    mg_start_thread(HttpWorkerThread, &mgr);
+  }
+  while (!IsKilled) {
+    mg_mgr_poll(&mgr, 200);
+  }
   mg_mgr_free(&mgr);
   closesocket(sock[0]);
   closesocket(sock[1]);
@@ -121,4 +139,5 @@ void DoHttpThread(void) {
   DoHttpThreadImpl();
   LOG("%s", "HttpThread terminated");
 }
+
 }  // namespace DiaoBot

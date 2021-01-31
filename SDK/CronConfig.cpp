@@ -4,7 +4,9 @@ namespace DiaoBot {
 
 template <typename T>
 static T SetBit(T x, int pos) {
-  if (pos == CronConfig::EVERY) return ~(static_cast<T>(0));
+  if (pos == CronConfig::EVERY) {
+    return ~(static_cast<T>(0));
+  }
   return x | (static_cast<T>(1) << pos);
 }
 

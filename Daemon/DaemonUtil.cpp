@@ -16,10 +16,10 @@ std::mutex ThreadSleepCVMutex;
 void PrintUsage(const char *argv0) { fprintf(stderr, "USAGE:\n\t%s <conf_file>\n", argv0); }
 
 void KillDiaoBotDaemon(void) {
-  {
+  do {
     std::lock_guard<std::mutex> lock(ThreadSleepCVMutex);
     IsKilled = true;
-  }
+  } while (false);
   ThreadSleepCV.notify_all();
 }
 
@@ -59,7 +59,10 @@ void LoadSharedObjects(void) {
 }
 
 void InitializeBotEngine(void) {
-  if (!MainConf.HasKV("root", "webhook")) throw std::runtime_error("Webhook URL not configured!");
+  if (!MainConf.HasKV("root", "webhook")) {
+    throw std::runtime_error("Webhook URL not configured!");
+  }
   BotEngine::GetInstance().SetWebhookUrl(MainConf.GetKV("root", "webhook"));
 }
+
 }  // namespace DiaoBot

@@ -14,6 +14,9 @@ const string WeworkMessage::ALL = "@all";
 const string WeworkMessage::ALL_GROUP = "@all_group";
 const string WeworkMessage::ALL_SUBSCRIBER = "@all_subscriber";
 
+constexpr string::size_type MAX_LENGTH = 2048;
+constexpr std::vector<WeworkNewsMessage::Article>::size_type MAX_ARTICLE_COUNT = 8;
+
 WeworkMessage::~WeworkMessage(void) {}
 
 string WeworkMessage::GetXml(void) const { return string(); }
@@ -41,7 +44,9 @@ class WeworkMarkdownMessageImpl {
 WeworkTextMessage::WeworkTextMessage(void) { PImpl = std::make_shared<WeworkTextMessageImpl>(); }
 
 bool WeworkTextMessage::SetContent(const string &c) {
-  if (c.length() > 2048) return false;
+  if (c.length() > MAX_LENGTH) {
+    return false;
+  }
   PImpl->Content = c;
   return true;
 }
@@ -112,13 +117,17 @@ string WeworkTextMessage::GetJson(void) const {
   if (!PImpl->MentionedList.empty()) {
     w.Key("mentioned_list");
     w.StartArray();
-    for (const auto &i : PImpl->MentionedList) w.String(i.c_str());
+    for (const auto &i : PImpl->MentionedList) {
+      w.String(i.c_str());
+    }
     w.EndArray();
   }
   if (!PImpl->MentionedMobileList.empty()) {
     w.Key("mentioned_mobile_list");
     w.StartArray();
-    for (const auto &i : PImpl->MentionedMobileList) w.String(i.c_str());
+    for (const auto &i : PImpl->MentionedMobileList) {
+      w.String(i.c_str());
+    }
     w.EndArray();
   }
   w.EndObject();
@@ -129,13 +138,17 @@ string WeworkTextMessage::GetJson(void) const {
 WeworkNewsMessage::WeworkNewsMessage(void) { PImpl = std::make_shared<WeworkNewsMessageImpl>(); }
 
 WeworkNewsMessage::Article *WeworkNewsMessage::AddArticle(void) {
-  if (PImpl->Articles.size() >= 8) return nullptr;
+  if (PImpl->Articles.size() >= MAX_ARTICLE_COUNT) {
+    return nullptr;
+  }
   PImpl->Articles.emplace_back(Article());
   return &(PImpl->Articles.back());
 }
 
 bool WeworkNewsMessage::AddArticle(const Article &article) {
-  if (PImpl->Articles.size() >= 8) return false;
+  if (PImpl->Articles.size() >= MAX_ARTICLE_COUNT) {
+    return false;
+  }
   PImpl->Articles.emplace_back(article);
   return true;
 }
@@ -224,7 +237,9 @@ WeworkMarkdownMessage::WeworkMarkdownMessage(void) {
 }
 
 bool WeworkMarkdownMessage::SetContent(const string &c) {
-  if (c.length() > 2048) return false;
+  if (c.length() > MAX_LENGTH) {
+    return false;
+  }
   PImpl->Content = c;
   return true;
 }

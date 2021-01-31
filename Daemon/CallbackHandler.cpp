@@ -24,7 +24,9 @@ static void DoVerifyURL(SimpleHttpMessage *msg, string *ret) {
   std::map<string, string> qsmap;
   for (auto &i : SplitString(msg->QueryString, '&')) {
     auto pos = i.find_first_of('=');
-    if (pos == string::npos) continue;
+    if (pos == string::npos) {
+      continue;
+    }
     qsmap.insert(
         std::make_pair(string(i.c_str(), pos), string(i.c_str() + pos + 1, i.length() - pos - 1)));
   }
@@ -40,7 +42,9 @@ void OnMessageReceived(SimpleHttpMessage *msg, string *ret) {
   std::map<string, string> qsmap;
   for (auto &i : SplitString(msg->QueryString, '&')) {
     auto pos = i.find_first_of('=');
-    if (pos == string::npos) continue;
+    if (pos == string::npos) {
+      continue;
+    }
     qsmap.insert(
         std::make_pair(string(i.c_str(), pos), string(i.c_str() + pos + 1, i.length() - pos - 1)));
   }
@@ -69,12 +73,13 @@ void OnMessageReceived(SimpleHttpMessage *msg, string *ret) {
     return;
   }
   std::shared_ptr<CallbackMessage> cbmsg;
-  if (strcmp(msgtype->GetText(), "text") == 0)
+  if (strcmp(msgtype->GetText(), "text") == 0) {
     cbmsg = std::make_shared<CallbackTextMessage>(root);
-  else if (strcmp(msgtype->GetText(), "event") == 0)
+  } else if (strcmp(msgtype->GetText(), "event") == 0) {
     cbmsg = std::make_shared<CallbackEventMessage>(root);
-  else if (strcmp(msgtype->GetText(), "attachment") == 0)
+  } else if (strcmp(msgtype->GetText(), "attachment") == 0) {
     cbmsg = std::make_shared<CallbackAttachmentMessage>(root);
+  }
   if (cbmsg == nullptr || cbmsg->HasExtractError) {
     *ret = "Invalid request";
     return;
@@ -83,7 +88,9 @@ void OnMessageReceived(SimpleHttpMessage *msg, string *ret) {
   std::shared_ptr<WeworkMessage> rmsg = nullptr;
   for (auto &i : GetEngineImpl()->ReplyMakerList) {
     auto logicptr = i.CreateReplyable();
-    if (!logicptr->WillReply(cbmsg)) continue;
+    if (!logicptr->WillReply(cbmsg)) {
+      continue;
+    }
     rmsg = logicptr->Reply(cbmsg);
     break;
   }
@@ -96,13 +103,12 @@ void OnMessageReceived(SimpleHttpMessage *msg, string *ret) {
 
 string *CallbackHandler(SimpleHttpMessage *msg) {
   auto ret = new string;
-  if (msg->Method == "GET")  // Verify URL
-  {
+  if (msg->Method == "GET") {  // Verify URL
     DoVerifyURL(msg, ret);
-  } else if (msg->Method == "POST")  // Callback
-  {
+  } else if (msg->Method == "POST") {  // Callback
     OnMessageReceived(msg, ret);
   }
   return ret;
 }
+
 }  // namespace DiaoBot

@@ -76,8 +76,8 @@ class WeworkMarkdownMessage : public WeworkMessage {
     string Name;   // callback related
     string Value;  // callback related
 
-    virtual void WriteJsonObject(
-        void *) const = 0;  // param is rapidjson::Writer<rapidjson::StringBuffer>*
+    // param is rapidjson::Writer<rapidjson::StringBuffer>*
+    virtual void WriteJsonObject(void *) const = 0;
   };
   struct ButtonAction : public Action {
     string Text;

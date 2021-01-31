@@ -38,8 +38,9 @@ int main(int argc, char *argv[]) {
     LOG("Assumed pid file is %s", pid_file.c_str());
     do {
       string pid_string = DiaoBot::ReadFile(pid_file.c_str());
-      if (pid_string.empty())  // OK
+      if (pid_string.empty()) {  // OK
         break;
+      }
       pid_t prev_pid;
       if (sscanf(pid_string.c_str(), "%d", &prev_pid) != 1)  // Cannot read a PID integer
       {
@@ -59,8 +60,9 @@ int main(int argc, char *argv[]) {
       LOG("%s", "fork() failed!");
       exit(EXIT_FAILURE);
     }
-    if (pid != 0)  // parent
+    if (pid != 0) {  // parent
       exit(EXIT_SUCCESS);
+    }
     if (setsid() == -1) {
       LOG("%s", "setsid() failed!");
       exit(EXIT_FAILURE);
@@ -85,8 +87,10 @@ int main(int argc, char *argv[]) {
     // RUN!
     DoMain();
   }
-  if (argc == 2)  // daemon
+  if (argc == 2) {
+    // daemon
     unlink(pid_file.c_str());
+  }
   LOG("%s", "Finishing `main`.");
 }
 
